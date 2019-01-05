@@ -23,7 +23,7 @@ body{
 .main-content{
 	color: #58595b;
 	text-align: center;
-	padding-top: 15%;
+	padding-top: 10%;
 }
 
 h1{
@@ -36,3 +36,7 @@ h5{
     font-size: 1em;
 }
 
+.div-form-style{
+    margin: 20px auto;
+    width: 30%
+}
