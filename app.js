@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public")); 
 
-mongoose.connect("mongodb://localhost/doc-checker", {useNewUrlParser: true});
+mongoose.connect(process.env.DATABASEURL, {useNewUrlParser: true});
 
 let docSchema = new mongoose.Schema({
     name: String,
