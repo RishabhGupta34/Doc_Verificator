@@ -10,6 +10,119 @@ let express     = require("express"),
     sha256      = require("sha256"),
     multer      = require("multer");
     
+var Web3=require('web3'); 
+ // set the provider you want from Web3.providers
+var web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/cbfbd8fd2d124b66890e2c0ad4f0ebd3'));
+
+web3.eth.defaultAccount = web3.eth.accounts[0];
+console.log(web3.eth.accounts[0]);
+var CoursesContract = web3.eth.contract([
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_s_id",
+				"type": "string"
+			},
+			{
+				"name": "_c_id",
+				"type": "string"
+			},
+			{
+				"name": "_doc_hash",
+				"type": "string"
+			}
+		],
+		"name": "getstud",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_s_name",
+				"type": "string"
+			},
+			{
+				"name": "_s_id",
+				"type": "string"
+			},
+			{
+				"name": "_c_id",
+				"type": "string"
+			},
+			{
+				"name": "_doc_hash",
+				"type": "string"
+			},
+			{
+				"name": "_c_name",
+				"type": "string"
+			}
+		],
+		"name": "newstudent",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_a",
+				"type": "string"
+			},
+			{
+				"name": "_b",
+				"type": "string"
+			}
+		],
+		"name": "strConcat",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_a",
+				"type": "string"
+			},
+			{
+				"name": "_b",
+				"type": "string"
+			}
+		],
+		"name": "stringsEqual",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]);
+var Doc_verificator = CoursesContract.at('0xd690b3e15c53572cb54a63720eae3961e2e3ec1d');
+    
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -71,7 +184,7 @@ app.post("/upload", upload.any(), function(req, res){
                        college: college,
                        college_id: college_id
                     };
-                   
+                   Doc_verificator.newstudent(name,roll,college_id,hash_data,college);
                     console.log(newDoc);
                    
                     Degree.create(newDoc, function(err, createdDoc){
@@ -94,15 +207,12 @@ app.get("/verify", function(req, res){
     res.render("verify");
 });
 
-app.post("/verify", function(req, res){
-   let name = req.body.name;
+app.post("/verify", upload.any(), function(req, res){
    let roll = req.body.roll;
-   let college = req.body.college;
    let college_id = req.body.college_id;
    let file;
    let hash_data;
-   let newDoc;
-   
+
    fs.rename(req.files[0].path, req.files[0].destination + req.files[0].originalname, function(err){
         if (err){
            return console.log(err);
@@ -118,7 +228,7 @@ app.post("/verify", function(req, res){
                 else{
                     hash_data = sha256(data);
                     // console.log(hash_data);
-                    // PUT SCRIPT HERE
+                    console.log(Doc_verificator.getstud(roll,college_id,hash_data));
                 }
             });
         }
